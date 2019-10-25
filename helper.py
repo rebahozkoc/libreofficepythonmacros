@@ -29,7 +29,8 @@ import time
 #    subprocess.Popen("soffice --calc --accept=\"socket,host=localhost,port=2002;urp;StarOffice.ServiceManager\"", shell=True)
 #    time.sleep(1)
 
-
+def start_libreoffice():
+    print("rehrefg")
 
 
 def connect_to_libreoffice():
