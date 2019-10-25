@@ -89,6 +89,14 @@ def new_impress_doc():
     desktop = start_libreoffice()
     return desktop.loadComponentFromURL('private:factory/simpress', 'blank', 0, ())
 
+def convertToUrl(path):
+    return "file://" + path
+
+
+def open_doc(path1):
+    desktop = start_libreoffice()
+    FileURL = convertToUrl(path1)
+    return desktop.loadComponentFromURL(FileURL,"_blank",0,())
 
 
 #Old version of connection function
