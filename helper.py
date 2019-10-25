@@ -1,5 +1,4 @@
-import socket
-from sys import platform
+import socket #Only for windows
 import os
 import shutil
 import subprocess
@@ -7,7 +6,6 @@ import tempfile
 import time
 import uno
 import uuid
-
 from com.sun.star.connection import NoConnectException
 
 
@@ -57,7 +55,7 @@ def start_libreoffice():
         '--invisible']
     sofficeEnvironment = os.environ
     sofficeEnvironment['TMPDIR'] = tempDir
-    proc = subprocess.Popen(args, env=sofficeEnvironment, preexec_fn=os.setsid)
+    subprocess.Popen(args, env=sofficeEnvironment, preexec_fn=os.setsid)
     # Open connection to server
     for i in range(100):
         try:
@@ -74,17 +72,30 @@ def start_libreoffice():
     # Cache profile if required
     if not profileCached:
         shutil.copytree(userProfile, cacheDir)
+    return context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop",context)
 
-    desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop",context)
+
+def new_writer_doc():
+    desktop = start_libreoffice()
     return desktop.loadComponentFromURL('private:factory/swriter', 'blank', 0, ())
 
 
+def new_calc_doc():
+    desktop = start_libreoffice()
+    return desktop.loadComponentFromURL('private:factory/scalc', 'blank', 0, ())
 
 
-def connect_to_libreoffice():
-    localContext = uno.getComponentContext()
-    resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
-    return resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+def new_impress_doc():
+    desktop = start_libreoffice()
+    return desktop.loadComponentFromURL('private:factory/simpress', 'blank', 0, ())
+
+
+
+#Old version of connection function
+# def connect_to_libreoffice():
+#     localContext = uno.getComponentContext()
+#     resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
+#     return resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
 
 
 def get_current_doc(ctx1):
@@ -95,9 +106,6 @@ def get_current_doc(ctx1):
 
 def get_active_sheet(model1):
     return model1.CurrentController.ActiveSheet
-
-
-# active_sheet = get_active_sheet(get_current_doc(connect_to_libreoffice()))
 
 
 def get_cell_from_sheet(cell_name, sheet):
@@ -162,59 +170,59 @@ def field_determine(starting, ending):
     return address_list
 
 
-def str_exists_in_cells(start_addr, end_addr, search_term):
+def str_exists_in_cells(start_addr, end_addr, search_term, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a string
     :returns True if search_term exits between start_addr and end_addr, false otherwise """
     scope = field_determine(start_addr, end_addr)
     for i in scope:
-        inner_cell = active_sheet.getCellRangeByName(i)
+        inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.String == search_term:
             return True
     return False
 
 
-def value_exists_in_cells(start_addr, end_addr, value):
+def value_exists_in_cells(start_addr, end_addr, value, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a value
     :returns True if search_term exits between start_addr and end_addr, false otherwise """
     scope = field_determine(start_addr, end_addr)
     for i in scope:
-        inner_cell = active_sheet.getCellRangeByName(i)
+        inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.Value == value:
             return True
     return False
 
 
-def search_str_in_cells(start_addr, end_addr, search_term):
+def search_str_in_cells(start_addr, end_addr, search_term, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a string
     :returns first occurrence of search_term's address if search_term exits between start_addr and end_addr, false otherwise """
     scope = field_determine(start_addr, end_addr)
     for i in scope:
-        inner_cell = active_sheet.getCellRangeByName(i)
+        inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.String == search_term:
             return i
     return False
 
 
-def search_value_in_cells(start_addr, end_addr, value):
+def search_value_in_cells(start_addr, end_addr, value, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a value
     :returns first occurrence of search_term's address if search_term exits between start_addr and end_addr, false otherwise """
     scope = field_determine(start_addr, end_addr)
     for i in scope:
-        inner_cell = active_sheet.getCellRangeByName(i)
+        inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.Value == value:
             return i
     return False
 
 
-def get_cell_text_with_addr(cell_addr):
+def get_cell_text_with_addr(cell_addr, sheet):
     """Assumes cell_addr is an address of a cell
     returns cell_addr's content as string """
-    inner_cell = active_sheet.getCellRangeByName(cell_addr)
+    inner_cell = sheet.getCellRangeByName(cell_addr)
     return inner_cell.String
 
 
-def set_cell_text_with_addr(cell_addr, new_str):
+def set_cell_text_with_addr(cell_addr, new_str, sheet):
     """Assumes cell_addr is an address of a cell and new_str is a string
     sets cell_addr to new_str """
-    inner_cell = active_sheet.getCellRangeByName(cell_addr)
+    inner_cell = sheet.getCellRangeByName(cell_addr)
     inner_cell.String = new_str
