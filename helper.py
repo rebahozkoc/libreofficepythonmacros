@@ -75,27 +75,22 @@ def start_libreoffice():
     return context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop",context)
 
 
-def new_writer_doc():
-    desktop = start_libreoffice()
+def new_writer_doc(desktop):
     return desktop.loadComponentFromURL('private:factory/swriter', 'blank', 0, ())
 
 
-def new_calc_doc():
-    desktop = start_libreoffice()
+def new_calc_doc(desktop):
     return desktop.loadComponentFromURL('private:factory/scalc', 'blank', 0, ())
 
 
-def new_impress_doc():
-    desktop = start_libreoffice()
+def new_impress_doc(desktop):
     return desktop.loadComponentFromURL('private:factory/simpress', 'blank', 0, ())
 
-def convertToUrl(path):
-    return "file://" + path
 
+# path = uno.fileUrlToSystemPath(url) may help later
 
-def open_doc(path1):
-    desktop = start_libreoffice()
-    FileURL = convertToUrl(path1)
+def open_doc(desktop, path1):
+    FileURL = uno.systemPathToFileUrl(path1)
     return desktop.loadComponentFromURL(FileURL,"_blank",0,())
 
 
@@ -234,3 +229,54 @@ def set_cell_text_with_addr(cell_addr, new_str, sheet):
     sets cell_addr to new_str """
     inner_cell = sheet.getCellRangeByName(cell_addr)
     inner_cell.String = new_str
+
+
+def text_find(doc, find_text, case_sensitive = False):
+    # find text in the document considering case sentivity as given by case-sentive field, and select the found text
+    #default case sensitive: false
+    #Select the found text with cursor.
+    search = doc.createSearchDescriptor()
+    search.SearchString = find_text
+    if case_sensitive:
+        search.SearchCaseSensitive = True
+    found = doc.findFirst(search)
+    if found is not None:
+        #print("found",found)
+        viewCursor = doc.getCurrentController()
+        oVC = viewCursor.getViewCursor()
+        oVC.gotoRange(found, False)
+        return True
+    else:
+        return False
+
+
+def text_replace_all(doc, find_text, replace_with, case_sensitive = False, whole_words = False):
+    # replace all text in document. find-text will be replaced with replace-with
+    search = doc.createSearchDescriptor()
+    search.SearchString = find_text
+    search.SearchWords = whole_words
+    if case_sensitive:
+        search.SearchCaseSensitive = True
+    found = doc.findFirst(search)
+    if found is None:
+        return False
+    found.String = replace_with
+
+
+def writer_text_insert(doc):
+    text = doc.Text
+    viewCursor = doc.getCurrentController()
+    oVC = viewCursor.getViewCursor()
+    oVC.goRight(3,False)
+    if oVC.isCollapsed():
+        print("hereeeee!")
+        text.insertString(oVC,"Hello World",43)
+    else:
+        oVC.String.insertString(oVC,"Hello World",2)
+
+def writer_image_instert_from_file(doc):
+    #FileURL = uno.systemPathToFileUrl(file_path)
+    file = open("image.jpg", "wb")
+    doc.insert_image(file)
+
+
