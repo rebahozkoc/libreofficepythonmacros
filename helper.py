@@ -7,6 +7,7 @@ import time
 import uno
 import uuid
 from com.sun.star.connection import NoConnectException
+from com.sun.star.text.TextContentAnchorType import AS_CHARACTER
 
 
 # get the uno component context from the PyUNO runtime
@@ -35,6 +36,7 @@ from com.sun.star.connection import NoConnectException
 def start_libreoffice():
     sofficePath = '/usr/bin/soffice'
     tempDir = tempfile.mkdtemp()
+
     # Restore cached profile if available
     userProfile = tempDir + '/profile'
     cacheDir = os.getenv('XDG_CACHE_DIR', os.environ['HOME'] + '/.cache') + '/lo_profile_cache'
@@ -107,23 +109,23 @@ def get_current_doc(ctx1):
     return desktop.getCurrentComponent()
 
 
-def get_active_sheet(model1):
+def calc_get_active_sheet(model1):
     return model1.CurrentController.ActiveSheet
 
 
-def get_cell_from_sheet(cell_name, sheet):
+def calc_call_get_cell_from_sheet(cell_name, sheet):
     return sheet.getCellRangeByName(cell_name)
 
 
-def set_cell_text(cell1, text):
+def calc_set_cell_text(cell1, text):
     cell1.String = text
 
 
-def get_cell_text(cell):
+def calc_get_cell_text(cell):
     return cell.String
 
 
-def address_spliter(string):
+def inside_address_spliter(string):
     """Assumes string consist with letters and numbers, respectively.
      :returns a tuple whose first element is letters second is numbers"""
     digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -135,7 +137,7 @@ def address_spliter(string):
             return string[0:i + 1], int(number)
 
 
-def base26_to_decimal(start, end):
+def inside_base26_to_decimal(start, end):
     """A supplementary function for field_determine"""
     base_number = 1
     end_value = 0
@@ -152,7 +154,7 @@ def base26_to_decimal(start, end):
     return start_value, end_value
 
 
-def base26(x):
+def inside_base26(x):
     """A supplementary function for field_determine"""
     number = ""
     while x > 26:
@@ -161,22 +163,22 @@ def base26(x):
     return chr(x + 64) + number
 
 
-def field_determine(starting, ending):
+def inside_field_determine(starting, ending):
     """Assumes starting and ending are adresses of cells
     :returns cells' addresses between starting and ending"""
-    start, end = address_spliter(starting), address_spliter(ending)
-    decimal_value = base26_to_decimal(start[0], end[0])
+    start, end = inside_address_spliter(starting), inside_address_spliter(ending)
+    decimal_value = inside_base26_to_decimal(start[0], end[0])
     address_list = []
     for i in range(end[1] - start[1] + 1):
         for j in range(decimal_value[0], decimal_value[1] + 1):
-            address_list.append((base26(j)) + str(start[1] + i))
+            address_list.append((inside_base26(j)) + str(start[1] + i))
     return address_list
 
 
-def str_exists_in_cells(start_addr, end_addr, search_term, sheet):
+def calc_str_exists_in_cells(start_addr, end_addr, search_term, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a string
     :returns True if search_term exits between start_addr and end_addr, false otherwise """
-    scope = field_determine(start_addr, end_addr)
+    scope = inside_field_determine(start_addr, end_addr)
     for i in scope:
         inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.String == search_term:
@@ -184,10 +186,10 @@ def str_exists_in_cells(start_addr, end_addr, search_term, sheet):
     return False
 
 
-def value_exists_in_cells(start_addr, end_addr, value, sheet):
+def calc_value_exists_in_cells(start_addr, end_addr, value, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a value
     :returns True if search_term exits between start_addr and end_addr, false otherwise """
-    scope = field_determine(start_addr, end_addr)
+    scope = inside_field_determine(start_addr, end_addr)
     for i in scope:
         inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.Value == value:
@@ -195,10 +197,10 @@ def value_exists_in_cells(start_addr, end_addr, value, sheet):
     return False
 
 
-def search_str_in_cells(start_addr, end_addr, search_term, sheet):
+def calc_search_str_in_cells(start_addr, end_addr, search_term, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a string
     :returns first occurrence of search_term's address if search_term exits between start_addr and end_addr, false otherwise """
-    scope = field_determine(start_addr, end_addr)
+    scope = inside_field_determine(start_addr, end_addr)
     for i in scope:
         inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.String == search_term:
@@ -206,10 +208,10 @@ def search_str_in_cells(start_addr, end_addr, search_term, sheet):
     return False
 
 
-def search_value_in_cells(start_addr, end_addr, value, sheet):
+def calc_search_value_in_cells(start_addr, end_addr, value, sheet):
     """Assumes starting and ending are adresses of cells, and search_term is a value
     :returns first occurrence of search_term's address if search_term exits between start_addr and end_addr, false otherwise """
-    scope = field_determine(start_addr, end_addr)
+    scope = inside_field_determine(start_addr, end_addr)
     for i in scope:
         inner_cell = sheet.getCellRangeByName(i)
         if inner_cell.Value == value:
@@ -217,21 +219,21 @@ def search_value_in_cells(start_addr, end_addr, value, sheet):
     return False
 
 
-def get_cell_text_with_addr(cell_addr, sheet):
+def calc_get_cell_text_with_addr(cell_addr, sheet):
     """Assumes cell_addr is an address of a cell
     returns cell_addr's content as string """
     inner_cell = sheet.getCellRangeByName(cell_addr)
     return inner_cell.String
 
 
-def set_cell_text_with_addr(cell_addr, new_str, sheet):
+def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     """Assumes cell_addr is an address of a cell and new_str is a string
     sets cell_addr to new_str """
     inner_cell = sheet.getCellRangeByName(cell_addr)
     inner_cell.String = new_str
 
 
-def text_find(doc, find_text, case_sensitive = False):
+def writer_text_find(doc, find_text, case_sensitive = False):
     # find text in the document considering case sentivity as given by case-sentive field, and select the found text
     #default case sensitive: false
     #Select the found text with cursor.
@@ -250,33 +252,47 @@ def text_find(doc, find_text, case_sensitive = False):
         return False
 
 
-def text_replace_all(doc, find_text, replace_with, case_sensitive = False, whole_words = False):
-    # replace all text in document. find-text will be replaced with replace-with
+def writer_text_replace_all(doc, find_text, replace_with, case_sensitive = False, whole_words = False):
+    """Replaces all find_text with replace_with in document"""
     search = doc.createSearchDescriptor()
     search.SearchString = find_text
     search.SearchWords = whole_words
-    if case_sensitive:
-        search.SearchCaseSensitive = True
+    search.SearchCaseSensitive = case_sensitive
     found = doc.findFirst(search)
     if found is None:
         return False
-    found.String = replace_with
+    while found is not None:
+        found.String = replace_with
+        search = doc.createSearchDescriptor()
+        search.SearchString = find_text
+        search.SearchWords = whole_words
+        search.SearchCaseSensitive = case_sensitive
+        found = doc.findFirst(search)
+    return True
 
 
-def writer_text_insert(doc):
+
+def writer_text_insert(doc, content):
     text = doc.Text
     viewCursor = doc.getCurrentController()
     oVC = viewCursor.getViewCursor()
-    oVC.goRight(3,False)
     if oVC.isCollapsed():
-        print("hereeeee!")
-        text.insertString(oVC,"Hello World",43)
+        text.insertString(oVC, content, 0)
     else:
-        oVC.String.insertString(oVC,"Hello World",2)
+        oVC.String = ""
+        text = doc.Text
+        text.insertString(oVC, content, 0)
 
-def writer_image_instert_from_file(doc):
-    #FileURL = uno.systemPathToFileUrl(file_path)
-    file = open("image.jpg", "wb")
-    doc.insert_image(file)
 
+def writer_image_insert_from_file(doc,file_path):
+    FileURL = uno.systemPathToFileUrl(file_path)
+    text = doc.getText()
+    oCursor = text.createTextCursor()
+    oGraph = doc.createInstance("com.sun.star.text.GraphicObject")
+    oGraph.GraphicURL = FileURL
+    oGraph.AnchorType = AS_CHARACTER
+    oGraph.Width = 10000
+    oGraph.Height = 8000
+    time.sleep(3)
+    text.insertTextContent(oCursor, oGraph, False)
 
