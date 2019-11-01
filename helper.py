@@ -101,24 +101,22 @@ def open_doc(desktop, path1):
 #     localContext = uno.getComponentContext()
 #     resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
 #     return resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+# def get_current_doc(ctx1):
+#     smgr = ctx1.ServiceManager
+#     desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx1)
+#     return desktop.getCurrentComponent()
 
 
-def get_current_doc(ctx1):
-    smgr = ctx1.ServiceManager
-    desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx1)
-    return desktop.getCurrentComponent()
+def calc_get_active_sheet(model):
+    return model.CurrentController.ActiveSheet
 
 
-def calc_get_active_sheet(model1):
-    return model1.CurrentController.ActiveSheet
-
-
-def calc_call_get_cell_from_sheet(cell_name, sheet):
+def calc_get_cell_from_sheet(cell_name, sheet):
     return sheet.getCellRangeByName(cell_name)
 
 
-def calc_set_cell_text(cell1, text):
-    cell1.String = text
+def calc_set_cell_text(cell, text):
+    cell.String = text
 
 
 def calc_get_cell_text(cell):
@@ -157,7 +155,7 @@ def inside_base26_to_decimal(start, end):
 def inside_base26(x):
     """A supplementary function for field_determine"""
     number = ""
-    while x > 26:
+    while 0 > x > 26:
         number = chr(x % 26 + 64) + number
         x = x // 26
     return chr(x + 64) + number
@@ -293,6 +291,5 @@ def writer_image_insert_from_file(doc,file_path):
     oGraph.AnchorType = AS_CHARACTER
     oGraph.Width = 10000
     oGraph.Height = 8000
-    time.sleep(3)
     text.insertTextContent(oCursor, oGraph, False)
 
