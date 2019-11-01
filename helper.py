@@ -155,10 +155,11 @@ def inside_base26_to_decimal(start, end):
 def inside_base26(x):
     """A supplementary function for field_determine"""
     number = ""
-    while 0 > x > 26:
-        number = chr(x % 26 + 64) + number
-        x = x // 26
-    return chr(x + 64) + number
+    while x > 0:
+        modulo = (x - 1) % 26
+        number = chr(modulo + 65) + number
+        x = (x-modulo)//26
+    return number
 
 
 def inside_field_determine(starting, ending):

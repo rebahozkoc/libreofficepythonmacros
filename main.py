@@ -11,8 +11,8 @@ import helper
 #inner_cell = active_sheet.getCellRangeByName("BD8")
 #inner_cell.String = "213"
 #(oCursor.DBG_methods)
-#print(helper.inside_field_determine("A1","ABD2"))
+print(helper.inside_field_determine("A1","BD2"))
 #helper.writer_image_insert_from_file(doc,"/home/rebahlinux/libreProject/image.jpg")
 print(helper.inside_base26(0))
 #doc.close(True)
-print(helper.inside_base26_to_decimal("A","BB"))
+#print(helper.inside_base26_to_decimal("A","BB"))
