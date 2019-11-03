@@ -222,8 +222,10 @@ def calc_get_cell_text_with_addr(cell_addr, sheet):
     """Assumes cell_addr is an address of a cell
     returns cell_addr's content as string """
     inner_cell = sheet.getCellRangeByName(cell_addr)
-    return inner_cell.String
-
+    if inner_cell.String is not None:
+        return inner_cell.String
+    else:
+        return False
 
 def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     """Assumes cell_addr is an address of a cell and new_str is a string
@@ -268,7 +270,6 @@ def writer_text_replace_all(doc, find_text, replace_with, case_sensitive = False
         search.SearchCaseSensitive = case_sensitive
         found = doc.findFirst(search)
     return True
-
 
 
 def writer_text_insert(doc, content):

@@ -1,6 +1,6 @@
 import helper
-#desktop = helper.start_libreoffice()
-#doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/calc_example.ods")
+desktop = helper.start_libreoffice()
+doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/calc_example.ods")
 
 #helper.writer_text_replace_all(doc, "office", "ofis", case_sensitive=False, whole_words=False)
 
