@@ -220,12 +220,11 @@ def calc_search_value_in_cells(start_addr, end_addr, value, sheet):
 
 def calc_get_cell_text_with_addr(cell_addr, sheet):
     """Assumes cell_addr is an address of a cell
-    returns cell_addr's content as string """
+    returns cell_addr's content as a string """
     inner_cell = sheet.getCellRangeByName(cell_addr)
-    if inner_cell.String is not None:
-        return inner_cell.String
-    else:
-        return False
+    return inner_cell.String
+
+
 
 def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     """Assumes cell_addr is an address of a cell and new_str is a string
