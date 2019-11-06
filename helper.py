@@ -8,7 +8,10 @@ import uno
 import uuid
 from com.sun.star.connection import NoConnectException
 from com.sun.star.text.TextContentAnchorType import AS_CHARACTER
-
+from com.sun.star.beans import PropertyValue
+def createUnoService(serviceName):
+    sm = uno.getComponentContext().ServiceManager
+    return sm.createInstanceWithContext(serviceName, uno.getComponentContext())
 
 # get the uno component context from the PyUNO runtime
 
@@ -294,3 +297,83 @@ def writer_image_insert_from_file(doc,file_path):
     oGraph.Height = 8000
     text.insertTextContent(oCursor, oGraph, False)
 
+
+def impress_remove_page_by_page_number(doc, page_number):
+    pages = doc.getDrawPages()
+    selected_page = pages.getByIndex(page_number-1)
+    pages.remove(selected_page)
+
+
+def impress_text_search(doc, find_text, case_sensitive = False, whole_words = False):
+    page_index = 0
+    pages = doc.getDrawPages()
+    for selected_page in pages:
+        search = selected_page.createSearchDescriptor()
+        search.SearchString = find_text
+        search.SearchWords = whole_words
+        search.SearchCaseSensitive = case_sensitive
+        found = selected_page.findFirst(search)
+        if found is not None:
+            print(page_index)
+            print("found:",found)
+
+            #oViewCursor = currentController.getViewCursor()
+            #print("current controller:",currentController)
+            #a = currentController.Frame.ContainerWindow.toFront()
+            #print(currentController)
+            #currentController.Frame.Activate()
+            #oShapes = createUnoService("com.sun.star.drawing.ShapeCollection")
+            print("page:",selected_page)
+            sayi = selected_page.getCount()
+            for i in range(0,sayi):
+                print("shape:",i,selected_page.getByIndex(i),"\n")
+                selected_shape = selected_page.getByIndex(i)
+                #oTextCursor = selected_shape.Text.createTextCursor()
+                #oTextCursor.gotoRange(found, True)
+                #oTextCursor.gotoStart(False)
+                #oTextCursor.gotoEnd(True)
+                #currentController = selected_shape.Control()
+                #Cursor = selected_shape.Text.getCurrentController()
+                #print("cursor:",Cursor)
+
+                #oTextCursor.setString("22")
+
+                #text_properties = yazi.TextProperties
+                #print("text_properties:", text_properties)
+                #viewCursor = yazi.getCurrentController()
+                # #oVC = viewCursor.getViewCursor()
+                #currentController = doc.setCurrentController(selected_page)
+                #frame = currentController.Frame
+                #a = frame.setCurrentController(selected_shape)
+                #print(a)
+                localContext = uno.getComponentContext()
+                args1 = ()
+                # args1[0] = PropertyValue
+                args1[0].Name = "SearchItem.SearchString"
+                args1[0].Value = "Introducing"
+                dispatcher = createUnoService("com.sun.star.frame.DispatchHelper")
+                dispatcher.executeDispatch(doc, ".uno:ExecuteSearch", "", 0, selected_shape)
+
+            return True
+        page_index += 1
+    return False
+
+
+def impress_new_page(doc):
+    doc.createDrawPage("Test draw", True)
+
+
+        # viewCursor = selected_page.getCurrentController()
+        # oVC = viewCursor.getViewCursor()
+        # oVC.gotoRange(found, False)
+        #
+
+
+def impress_text_replace_all(x):
+    #print("shape:",i,selected_page.getByIndex(i),"\n")
+     #           selected_shape = selected_page.getByIndex(i)
+     #           oTextCursor = selected_shape.Text.createTextCursor()
+      #          #oTextCursor.gotoRange(found, True)
+       #         oTextCursor.gotoStart(False)
+        #        oTextCursor.setString("22")
+        pass

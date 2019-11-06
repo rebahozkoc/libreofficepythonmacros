@@ -106,10 +106,22 @@ def test_calc_functions(desktop):
     doc.close(False)
 
 
+def test_impress_functions(desktop):
+    doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
+    standard_testing(helper.impress_text_search, 2, doc, "Manager")
+    standard_testing(helper.impress_text_search, 0, doc, "manager", True)
+    standard_testing(helper.impress_text_search, 0, doc, "PLACEHOLDER")
+    standard_testing(helper.impress_text_search, 0, doc, "Manage", True, True)
+    standard_testing(helper.impress_remove_page_by_page_number, -1, doc, 1)
+    doc.close(False)
+
+
 desktop = standard_testing(helper.start_libreoffice, 1)
-test_open_new_files(desktop)
-test_open_existing_file(desktop)
-test_calc_functions(desktop)
-test_writer_functions(desktop)
+#test_open_new_files(desktop)
+#test_open_existing_file(desktop)
+#test_calc_functions(desktop)
+#test_writer_functions(desktop)
+
+test_impress_functions(desktop)
 
 print("out of program.")
