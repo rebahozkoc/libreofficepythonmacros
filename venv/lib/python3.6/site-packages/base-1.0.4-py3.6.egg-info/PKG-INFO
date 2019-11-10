@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: base
+Version: 1.0.4
+Summary: this is a test package for packing python liberaries tutorial.
+Home-page: http://www.zhangte.org/
+Author: 张特
+Author-email: 353335447@qq.com
+License: MIT
+Description: 需要依赖的包比较多
+        1. pandas
+        2. requets
+        3. msqldb
+        4. ....
+        
+Keywords: test python package
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent

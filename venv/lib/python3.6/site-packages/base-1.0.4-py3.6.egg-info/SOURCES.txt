@@ -1,0 +1,13 @@
+README.rst
+setup.cfg
+setup.py
+base/__init__.py
+base/base.py
+base/jiqixuexi.py
+base/seo.py
+base/taobao.py
+base.egg-info/PKG-INFO
+base.egg-info/SOURCES.txt
+base.egg-info/dependency_links.txt
+base.egg-info/top_level.txt
+base.egg-info/zip-safe
