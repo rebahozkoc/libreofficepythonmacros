@@ -74,7 +74,8 @@ def start_libreoffice():
     # Cache profile if required
     if not profileCached:
         shutil.copytree(userProfile, cacheDir)
-    return context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop",context)
+    return_list = [context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop",context), context]
+    return return_list
 
 
 def new_writer_doc(desktop):
@@ -225,7 +226,6 @@ def calc_get_cell_text_with_addr(cell_addr, sheet):
     return inner_cell.String
 
 
-
 def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     """Assumes cell_addr is an address of a cell and new_str is a string
     sets cell_addr to new_str """
@@ -294,3 +294,37 @@ def writer_image_insert_from_file(doc,file_path):
     oGraph.Height = 8000
     text.insertTextContent(oCursor, oGraph, False)
 
+
+def dispatcher(context):
+    localContext = uno.getComponentContext()
+    smgr = context.ServiceManager
+    dispatcher = smgr.createInstanceWithContext( "com.sun.star.frame.DispatchHelper", context)
+    return dispatcher
+
+
+def impress_text_search_dispatcher(doc, dispatcher, find_text, case_sensitive = False, whole_words = False):
+    page_index = 0
+    pages = doc.getDrawPages()
+    for selected_page in pages:
+        search = selected_page.createSearchDescriptor()
+        search.SearchString = find_text
+        search.SearchWords = whole_words
+        search.SearchCaseSensitive = case_sensitive
+        found = selected_page.findFirst(search)
+        if found is not None:
+            currentController = doc.getCurrentController()
+            struct = uno.createUnoStruct('com.sun.star.beans.PropertyValue')
+            struct.Name = "SearchItem.SearchString"
+            struct.Value = find_text
+            dispatcher.executeDispatch(currentController, ".uno:ExecuteSearch", "", 0, tuple([struct]))
+            return True
+        page_index += 1
+    return False
+
+
+def calc_dispatcher_example(doc, dispatcher):
+    currentController = doc.getCurrentController()
+    struct = uno.createUnoStruct('com.sun.star.beans.PropertyValue')
+    struct.Name = 'ToPoint'
+    struct.Value = 'Sheet1.A1'
+    dispatcher.executeDispatch(currentController, ".uno:GoToCell", "", 0, tuple([struct]))
