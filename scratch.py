@@ -42,14 +42,7 @@ def test_open_new_files(desktop):
         print("ERROR: writer could not be started.")
         return False
 
-
-def deneme(*args):
-    a = args[0:2]
-    print(*args)
-    print("args:",args)
-    print("*a:",*a)
+def documentation(x):
+    return x.replace(",",",\n")
 
 
-
-
-deneme(1,3243,5,2445,65,4,43,7)

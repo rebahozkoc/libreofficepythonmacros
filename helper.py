@@ -233,6 +233,24 @@ def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     inner_cell.String = new_str
 
 
+def calc_text_replace_all(active_sheet, find_text, replace_with, case_sensitive = False, whole_words = False):
+    search = active_sheet.createSearchDescriptor()
+    search.SearchString = find_text
+    search.SearchWords = whole_words
+    search.SearchCaseSensitive = case_sensitive
+    found = active_sheet.findFirst(search)
+    if found is None:
+        return False
+    while found is not None:
+        found.String = replace_with
+        search = active_sheet.createSearchDescriptor()
+        search.SearchString = find_text
+        search.SearchWords = whole_words
+        search.SearchCaseSensitive = case_sensitive
+        found = active_sheet.findFirst(search)
+    return True
+
+
 def writer_text_find(doc, find_text, case_sensitive = False):
     # find text in the document considering case sentivity as given by case-sentive field, and select the found text
     #default case sensitive: false
@@ -303,7 +321,6 @@ def dispatcher(context):
 
 
 def impress_text_search_dispatcher(doc, dispatcher, find_text, case_sensitive = False, whole_words = False):
-    page_index = 0
     pages = doc.getDrawPages()
     for selected_page in pages:
         search = selected_page.createSearchDescriptor()
@@ -318,8 +335,18 @@ def impress_text_search_dispatcher(doc, dispatcher, find_text, case_sensitive = 
             struct.Value = find_text
             dispatcher.executeDispatch(currentController, ".uno:ExecuteSearch", "", 0, tuple([struct]))
             return True
-        page_index += 1
     return False
+
+
+def impress_text_replace_all(doc, find_text, replace_with, case_sensitive = False, whole_words = False):
+    pages = doc.getDrawPages()
+    for selected_page in pages:
+        replace = selected_page.createReplaceDescriptor()
+        replace.setSearchString(find_text)
+        replace.setReplaceString(replace_with)
+        replace.SearchCaseSensitive = case_sensitive
+        replace.SearchWords = whole_words
+        selected_page.replaceAll(replace)
 
 
 def calc_dispatcher_example(doc, dispatcher):
