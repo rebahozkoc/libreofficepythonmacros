@@ -14,9 +14,11 @@ desktop = start_libreoffice_result[0]
 
 
 #Impress replace all
-doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
-print(helper.impress_text_replace_all(doc, "open", "acik"))
+#doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
+#print(helper.impress_text_replace_all(doc, "open", "acik"))
 
+helper.macro_wiper("calc_embeded.ods", "myscript.py", "calc_set_cell_text_with_addr")
+helper.delete_all_macros("calc_embeded.ods")
 
 #Impress searhing and selecting
 #doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")

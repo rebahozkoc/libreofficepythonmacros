@@ -93,8 +93,8 @@ def new_impress_doc(desktop):
 # path = uno.fileUrlToSystemPath(url) may help later
 
 def open_doc(desktop, path1):
-    FileURL = uno.systemPathToFileUrl(path1)
-    return desktop.loadComponentFromURL(FileURL,"_blank",0,())
+    fileURL = uno.systemPathToFileUrl(path1)
+    return desktop.loadComponentFromURL(fileURL,"_blank",0,())
 
 
 #Old version of connection function
@@ -233,7 +233,7 @@ def calc_set_cell_text_with_addr(cell_addr, new_str, sheet):
     inner_cell.String = new_str
 
 
-def calc_text_replace_all(active_sheet, find_text, replace_with, case_sensitive = False, whole_words = False):
+def calc_text_replace_all(active_sheet, find_text, replace_with, case_sensitive=False, whole_words=False):
     search = active_sheet.createSearchDescriptor()
     search.SearchString = find_text
     search.SearchWords = whole_words
@@ -252,16 +252,16 @@ def calc_text_replace_all(active_sheet, find_text, replace_with, case_sensitive 
 
 
 def writer_text_find(doc, find_text, case_sensitive = False):
-    # find text in the document considering case sentivity as given by case-sentive field, and select the found text
-    #default case sensitive: false
-    #Select the found text with cursor.
+    # find text in the document considering case sensitivity as given by case-sensitive field, and select the found text
+    # default case sensitive: false
+    # Select the found text with cursor.
     search = doc.createSearchDescriptor()
     search.SearchString = find_text
     if case_sensitive:
         search.SearchCaseSensitive = True
     found = doc.findFirst(search)
     if found is not None:
-        #print("found",found)
+        # print("found",found)
         viewCursor = doc.getCurrentController()
         oVC = viewCursor.getViewCursor()
         oVC.gotoRange(found, False)
@@ -270,7 +270,7 @@ def writer_text_find(doc, find_text, case_sensitive = False):
         return False
 
 
-def writer_text_replace_all(doc, find_text, replace_with, case_sensitive = False, whole_words = False):
+def writer_text_replace_all(doc, find_text, replace_with, case_sensitive=False, whole_words=False):
     """Replaces all find_text with replace_with in document"""
     search = doc.createSearchDescriptor()
     search.SearchString = find_text
@@ -302,11 +302,11 @@ def writer_text_insert(doc, content):
 
 
 def writer_image_insert_from_file(doc,file_path):
-    FileURL = uno.systemPathToFileUrl(file_path)
+    fileURL = uno.systemPathToFileUrl(file_path)
     text = doc.getText()
     oCursor = text.createTextCursor()
     oGraph = doc.createInstance("com.sun.star.text.GraphicObject")
-    oGraph.GraphicURL = FileURL
+    oGraph.GraphicURL = fileURL
     oGraph.AnchorType = AS_CHARACTER
     oGraph.Width = 10000
     oGraph.Height = 8000
@@ -355,3 +355,71 @@ def calc_dispatcher_example(doc, dispatcher):
     struct.Name = 'ToPoint'
     struct.Value = 'Sheet1.A1'
     dispatcher.executeDispatch(currentController, ".uno:GoToCell", "", 0, tuple([struct]))
+
+
+def macro_wiper(document_name, macro_name, function_name):
+    import zipfile
+    import shutil
+    import os
+
+    shutil.rmtree("without_macro",True)
+    os.mkdir("without_macro")
+    filename = "without_macro/" + document_name
+    shutil.copyfile(document_name, filename)
+    exporting = zipfile.ZipFile(filename, 'a')
+    myfile = exporting.open("Scripts/python/" +macro_name,'r')
+    new = open("temp.py","wb")
+    for aline in myfile.readlines():
+        new.write(aline)
+    new.close()
+    exporting.close()
+    editing = open("temp.py","r")
+    importing = open(macro_name, "w")
+    out_of_function = 1
+    deleted = 0
+    funcLen = len(function_name)
+    for line in editing.readlines():
+        line_list = line.split()
+        try:
+            if line_list[0] == "def" and line_list[1][:funcLen] == function_name:
+                deleted = 1
+                out_of_function = 0
+                continue
+            if deleted and line_list[0] == "def":
+                out_of_function = 1
+            if out_of_function:
+                importing.write(line)
+        except IndexError:
+            continue
+    editing.close()
+    importing.close()
+    os.remove("temp.py")
+    doc = zipfile.ZipFile(filename,'a')
+    doc.write(macro_name, "Scripts/python/"+ macro_name)
+    manifest = []
+    for line in doc.open('META-INF/manifest.xml'):
+        if '</manifest:manifest>' in line.decode('utf-8'):
+            for path in ['Scripts/','Scripts/python/','Scripts/python/'+ macro_name]:
+                manifest.append(' <manifest:file-entry manifest:media-type="application/binary" manifest:full-path="%s"/>' % path)
+        manifest.append(line.decode('utf-8'))
+    doc.writestr('META-INF/manifest.xml', ''.join(manifest))
+    doc.close()
+    os.remove(macro_name)
+
+
+def delete_all_macros(document_name):
+    import zipfile
+    import shutil
+    import os
+
+    shutil.rmtree("without_macros",True)
+    os.mkdir("without_macros")
+    filename = "without_macros/" + document_name
+    zin = zipfile.ZipFile(document_name, 'r')
+    zout = zipfile.ZipFile (filename, 'w')
+    for item in zin.infolist():
+        buffer = zin.read(item.filename)
+        if item.filename[-3:] != '.py':
+            zout.writestr(item, buffer)
+    zout.close()
+    zin.close()
