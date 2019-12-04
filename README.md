@@ -33,5 +33,5 @@ Please make sure to update tests as appropriate.
 
 
 ## License
- All of my past & future contributions to LibreOfficePythonMacros Project may be
+ All contributions to LibreOfficePythonMacros Project are
    licensed under the MPLv2/LGPLv3+ dual license.
