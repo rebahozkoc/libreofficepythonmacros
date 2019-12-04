@@ -13,9 +13,13 @@ Download or clone the repository. Use main.py to write commands.
 ```/opt/libreoffice$VERSION/program/python main.py```
 
 First part of the command depends your LibreOffice installation location.
+
 $VERSION is your LibreOffice version. 
+
 To run our program properly you need to use Python interpreter that comes with your LibreOffice. 
+
 If you have any problem here check out my guide:
+
 https://link.medium.com/5ehTA4WT81
 
 
