@@ -33,4 +33,5 @@ Please make sure to update tests as appropriate.
 
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+ All of my past & future contributions to LibreOfficePythonMacros Project may be
+   licensed under the MPLv2/LGPLv3+ dual license.
