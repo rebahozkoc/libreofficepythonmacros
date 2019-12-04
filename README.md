@@ -6,6 +6,8 @@ The project is not completed yet. It may have missing and faulty parts. I am wor
 ## Installation
 
 Download or clone the repository. Use main.py to write commands.
+In helper.py on line 20, specify the location of soffice.
+Use main.py to write commands.
 
 
 ## Usage
