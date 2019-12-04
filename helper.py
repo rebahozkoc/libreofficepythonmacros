@@ -34,7 +34,8 @@ from com.sun.star.text.TextContentAnchorType import AS_CHARACTER
 #    time.sleep(1)
 
 def start_libreoffice():
-    sofficePath = '/usr/bin/soffice'
+    #This depends on your LibreOffice installation location.
+    sofficePath = '/opt/libreofficedev6.4/program/soffice'
     tempDir = tempfile.mkdtemp()
 
     # Restore cached profile if available
@@ -408,6 +409,7 @@ def macro_wiper(document_name, macro_name, function_name):
 
 
 def delete_all_macros(document_name):
+    """Deletes all embedded macros from the given libreoffice document."""
     import zipfile
     import shutil
     import os
