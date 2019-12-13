@@ -30,7 +30,7 @@ def standard_testing(function_name, expected_result, *args):
             function_name(*args)
             result = True
         else:
-            raise Exception("ERROR: Arguments of the standard_testing function is not provided properly.\n")
+            raise Exception("ERROR: Arguments of the standard_testing function are not provided properly.\n")
     except Exception as e:
         print("ERROR: SOMETHING WENT WRONG WITH:",function_name, e, "\n")
         return False
@@ -91,7 +91,7 @@ def test_calc_functions(desktop):
     standard_testing(helper.calc_get_cell_text, 3, "I am at A4", cell )
     standard_testing(helper.calc_str_exists_in_cells, 2, "A1", "AA21", "E4 cell", active_sheet)
     standard_testing(helper.calc_str_exists_in_cells, 0, "A1","D5", "E4 cell", active_sheet)
-    standard_testing(helper.calc_value_exists_in_cells, 2, "A1","AA21", 42, active_sheet)
+    standard_testing(helper.calc_value_exists_in_cells, 2, "A1","AA21", 42, active_sheet) # I am here
     standard_testing(helper.calc_value_exists_in_cells, 0, "AA1","BD5", 42, active_sheet)
     standard_testing(helper.calc_search_str_in_cells, 3, "A4","A1","CC21","I am at A4",active_sheet)
     standard_testing(helper.calc_search_str_in_cells, 3, "A3", "A1", "CC21", "TESTING SET CELL AGAIN", active_sheet)

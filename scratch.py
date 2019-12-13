@@ -73,17 +73,26 @@ print(documentation("ere,df,ggedf, fdg"))
 
 import uno
 
+#
+# def my_1st_macro():
+#     # Won't run directly in Anaconda, Geany, KDevelop, PyCharm or else
+#     doc = XSCRIPTCONTEXT.getDocument()
+#     doc.getText().setString("Hello World!")
+# g_exportedScripts = my_1st_macro,
+#
+#
+# if __name__ == "__main__":
+#     ''' IDE runnable code: *Office as a service '''
+#     from IDE_utils import Runner, XSCRIPTCONTEXT
+#     with Runner() as jesse_owens:  # Start/Stop, Connect/Adapt
+#         my_1st_macro()  # Run
+#
 
-def my_1st_macro():
-    # Won't run directly in Anaconda, Geany, KDevelop, PyCharm or else
-    doc = XSCRIPTCONTEXT.getDocument()
-    doc.getText().setString("Hello World!")
-g_exportedScripts = my_1st_macro,
 
+def f(x):
+    a = x([(1, 'Geeks'), (2, 'For')])
+    return a
 
-if __name__ == "__main__":
-    ''' IDE runnable code: *Office as a service '''
-    from IDE_utils import Runner, XSCRIPTCONTEXT
-    with Runner() as jesse_owens:  # Start/Stop, Connect/Adapt
-        my_1st_macro()  # Run
-
+b = f(dict)
+print(b.keys())
+print(b)

@@ -1,5 +1,6 @@
 import helper
 import helper_oop
+import time
 
 #These two line is common. Uncomment a code block to try an example.
 #libreoffice = helper_oop.WordProcessor()
@@ -10,6 +11,8 @@ import helper_oop
 #Calc replace all
 #helper.new_calc_doc(desktop)
 model = helper_oop.WordProcessor()
+time.sleep(3)
+model.closeFile()
 #active_sheet = helper.calc_get_active_sheet(model)
 #print(helper.calc_text_replace_all(active_sheet, "E4 cell", "E5"))
 
