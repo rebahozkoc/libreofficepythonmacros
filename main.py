@@ -1,16 +1,17 @@
 import helper
+import helper_oop
 
 #These two line is common. Uncomment a code block to try an example.
-start_libreoffice_result = helper.start_libreoffice()
-desktop = start_libreoffice_result[0]
+#libreoffice = helper_oop.WordProcessor()
+#desktop = libreoffice.getDesktop()
 
-
-
+#print(type(libreoffice))
+#a = input("sfsz")
 #Calc replace all
-# helper.new_calc_doc(desktop)
-# model = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/calc_example.ods")
-# active_sheet = helper.calc_get_active_sheet(model)
-# print(helper.calc_text_replace_all(active_sheet, "E4 cell", "E5"))
+#helper.new_calc_doc(desktop)
+model = helper_oop.WordProcessor()
+#active_sheet = helper.calc_get_active_sheet(model)
+#print(helper.calc_text_replace_all(active_sheet, "E4 cell", "E5"))
 
 
 #Impress replace all
@@ -24,9 +25,9 @@ desktop = start_libreoffice_result[0]
 
 
 #Impress searhing and selecting
-doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
-dispatcher = helper.dispatcher(start_libreoffice_result[1])
-search = helper.impress_text_search_dispatcher(doc, dispatcher, "fork")
+#doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
+#dispatcher = helper.dispatcher(start_libreoffice_result[1])
+#search = helper.impress_text_search_dispatcher(doc, dispatcher, "fork")
 
 
 #Calc open a new file.
