@@ -59,33 +59,15 @@ class OfficeMacro:
     def getContext(self):
         return self.context
 
+    def getDispatcher(self):
+        serviceManager = self.getContext().ServiceManager
+        return serviceManager.createInstanceWithContext("com.sun.star.frame.DispatchHelper", self.getContext())
 
 class DocumentTypeError(Exception):
     """Wrong document type is given."""
     # Raise when a object is tried to construct with a wrong document type.
     def __init__(self):
         Exception.__init__(self, "Wrong document type is given.")
-
-
-class WordProcessor(OfficeMacro):
-    def __init__(self, document_name=None):
-        OfficeMacro.__init__(self)
-        # Open a blank document.
-        if document_name is None:
-            self.model = self.getDesktop().loadComponentFromURL('private:factory/swriter', 'blank', 0, ())
-        # Check document type and open.
-        elif "odt" in document_name:
-            fileURL = uno.systemPathToFileUrl(document_name)
-            self.model = self.getDesktop().loadComponentFromURL(fileURL, "_blank", 0, ())
-        else:
-            raise DocumentTypeError()
-
-    def getModel(self):
-        return self.model
-
-    # Close the existing file.
-    def closeFile(self, arg=False):
-        self.getModel().close(arg)
 
 
 class SpreadSheet(OfficeMacro):
@@ -124,6 +106,9 @@ class SpreadSheet(OfficeMacro):
 
 
     def getCellText(self, cell_name):
+        """Assumes cell_name is an address of a cell
+        returns cell_name's content as a string
+        """
         return self.getCellByName(cell_name).String
 
     @staticmethod
@@ -181,7 +166,7 @@ class SpreadSheet(OfficeMacro):
                 address_list.append((SpreadSheet.inside_base26(j)) + str(start[1] + i))
         return address_list
 
-    def checkStrExistsInCells(self, start_addr, end_addr, search_term):
+    def checkTextExists(self, start_addr, end_addr, search_term):
         """Assumes starting and ending are addresses of cells, and search_term is a string
         :returns True if search_term exits between start_addr and end_addr, false otherwise """
         scope = SpreadSheet.inside_field_determine(start_addr, end_addr)
@@ -191,14 +176,14 @@ class SpreadSheet(OfficeMacro):
                 return True
         return False
 
-    def checkValueExistsInCells(self, start_addr, end_addr, value):
+    def checkValueExists(self, start_addr, end_addr, value):
         """Assumes starting and ending are adresses of cells, and search_term is a value
         :returns True if search_term exits between start_addr and end_addr, false otherwise """
         scope = SpreadSheet.inside_field_determine(start_addr, end_addr)
         for i in scope:
             inner_cell = self.getCellByName(i)
-        if inner_cell.Value == value:
-            return True
+            if inner_cell.Value == value:
+                return True
         return False
 
     def getStrAdressInCells(self, start_addr, end_addr, search_term):
@@ -221,11 +206,6 @@ class SpreadSheet(OfficeMacro):
                 return i
         return False
 
-    def calc_get_cell_text_with_addr(self, cell_addr, sheet):
-        """Assumes cell_addr is an address of a cell
-        returns cell_addr's content as a string """
-        inner_cell = self.getCellByName(cell_addr)
-        return inner_cell.String
 
     def textReplaceAll(self, find_text, replace_with, case_sensitive=False, whole_words=False):
         # Create an object from find_text and specify its properties.
@@ -248,6 +228,95 @@ class SpreadSheet(OfficeMacro):
             found = active_sheet.findFirst(search)
             return True
 
+    def insertText(self, cell_name, text):
+        """Insert text in a cell after existing text."""
+        existing_text = self.getCellText(cell_name)
+        existing_text = existing_text + text
+        self.setCellText(cell_name, existing_text)
+        return existing_text
+
+
+class WordProcessor(OfficeMacro):
+    def __init__(self, document_name=None):
+        OfficeMacro.__init__(self)
+        # Open a blank document.
+        if document_name is None:
+            self.model = self.getDesktop().loadComponentFromURL('private:factory/swriter', 'blank', 0, ())
+        # Check document type and open.
+        elif "odt" in document_name:
+            fileURL = uno.systemPathToFileUrl(document_name)
+            self.model = self.getDesktop().loadComponentFromURL(fileURL, "_blank", 0, ())
+        else:
+            raise DocumentTypeError()
+
+    def getModel(self):
+        return self.model
+
+    # Close the opened file.
+    def closeFile(self, arg=False):
+        self.getModel().close(arg)
+
+    def checkTextExists(self, search_term, case_sensitive=False):
+        """find text in the document considering case sensitivity as given by case-sensitive field, and select the found text
+        default case sensitive: false
+        Select the found text with cursor.
+        """
+        model = self.getModel()
+        search = model.createSearchDescriptor()
+        search.SearchString = search_term
+        if case_sensitive:
+            search.SearchCaseSensitive = True
+        found = model.findFirst(search)
+        if found is not None:
+            # oVC means to View Cursor Object.
+            viewCursor = model.getCurrentController()
+            oVC = viewCursor.getViewCursor()
+            # False means do not select text between the current position of the cursor and found.
+            oVC.gotoRange(found, False)
+            return True
+        else:
+            return False
+
+
+    def textReplaceAll(self, search_term, replace_with, case_sensitive=False, whole_words=False):
+        """Replaces all find_text with replace_with in document"""
+        # Create an object from find_text and specify its properties.
+        model = self.getModel()
+        replace = model.createReplaceDescriptor()
+        replace.setSearchString(search_term)
+        replace.setReplaceString(replace_with)
+        replace.SearchCaseSensitive = case_sensitive
+        replace.SearchWords = whole_words
+        model.replaceAll(replace)
+
+
+    def insertText(self, text):
+        """ Insert text at the beginning of file."""
+        model = self.getModel()
+        text = model.Text
+        viewCursor = model.getCurrentController()
+        # oVC means to View Cursor Object.
+        oVC = viewCursor.getViewCursor()
+        if oVC.isCollapsed():
+            text.insertString(oVC, text, 0)
+        else:
+            oVC.String = ""
+            text = model.Text
+            text.insertString(oVC, text, 0)
+
+    def insertImage(self, file_path):
+        from com.sun.star.text.TextContentAnchorType import AS_CHARACTER
+        fileURL = uno.systemPathToFileUrl(file_path)
+        model = self.getModel()
+        text = model.getText()
+        oCursor = text.createTextCursor()
+        oGraph = model.createInstance("com.sun.star.text.GraphicObject")
+        oGraph.GraphicURL = fileURL
+        oGraph.AnchorType = AS_CHARACTER
+        # Set the image size.
+        oGraph.Width = 10000
+        oGraph.Height = 8000
+        text.insertTextContent(oCursor, oGraph, False)
 
 class Presentation(OfficeMacro):
     def __init__(self, document_name=None):
@@ -269,4 +338,41 @@ class Presentation(OfficeMacro):
     def closeFile(self, arg=False):
         self.getModel().close(arg)
 
+    def checkTextExists(self, search_term, case_sensitive=False, whole_words=False):
+        """find text in the document
+        Select the found text with cursor.
+        default case sensitivity: false
+        default whole word sensitivity: false
+        """
+        model = self.getModel()
+        pages = model.getDrawPages()
+        # Search every page individually.
+        for selected_page in pages:
+            search = selected_page.createSearchDescriptor()
+            search.SearchString = search_term
+            search.SearchWords = whole_words
+            search.SearchCaseSensitive = case_sensitive
+            found = selected_page.findFirst(search)
+            # Find the first occurrence and select it with cursor.
+            if found is not None:
+                currentController = model.getCurrentController()
+                struct = uno.createUnoStruct('com.sun.star.beans.PropertyValue')
+                struct.Name = "SearchItem.SearchString"
+                struct.Value = search_term
+                self.getDispatcher().executeDispatch(currentController, ".uno:ExecuteSearch", "", 0, tuple([struct]))
+                return True
+        return False
 
+    def textReplaceAll(self, search_term, replace_with, case_sensitive=False, whole_words=False):
+        """Replaces all find_text with replace_with in document"""
+        # Create an object from find_text and specify its properties.
+        model = self.getModel()
+        pages = model.getDrawPages()
+        # Search every page severally.
+        for selected_page in pages:
+            replace = selected_page.createReplaceDescriptor()
+            replace.setSearchString(search_term)
+            replace.setReplaceString(replace_with)
+            replace.SearchCaseSensitive = case_sensitive
+            replace.SearchWords = whole_words
+            selected_page.replaceAll(replace)

@@ -91,7 +91,7 @@ def test_calc_functions(desktop):
     standard_testing(helper.calc_get_cell_text, 3, "I am at A4", cell )
     standard_testing(helper.calc_str_exists_in_cells, 2, "A1", "AA21", "E4 cell", active_sheet)
     standard_testing(helper.calc_str_exists_in_cells, 0, "A1","D5", "E4 cell", active_sheet)
-    standard_testing(helper.calc_value_exists_in_cells, 2, "A1","AA21", 42, active_sheet) # I am here
+    standard_testing(helper.calc_value_exists_in_cells, 2, "A1","AA21", 42, active_sheet)
     standard_testing(helper.calc_value_exists_in_cells, 0, "AA1","BD5", 42, active_sheet)
     standard_testing(helper.calc_search_str_in_cells, 3, "A4","A1","CC21","I am at A4",active_sheet)
     standard_testing(helper.calc_search_str_in_cells, 3, "A3", "A1", "CC21", "TESTING SET CELL AGAIN", active_sheet)
@@ -99,7 +99,7 @@ def test_calc_functions(desktop):
     standard_testing(helper.calc_search_value_in_cells, 0, "BB1","CC200", 3.14159, active_sheet)
     standard_testing(helper.calc_search_value_in_cells, 3, "B5", "A4", "CC21", 3.14159, active_sheet)
     #standard_testing(helper.calc_search_value_in_cells, 0, "BB1","CC2000", 3.14159, active_sheet)
-    standard_testing(helper.calc_get_cell_text_with_addr, 3, "E4 cell", "E4", active_sheet)
+    standard_testing(helper.calc_get_cell_text_with_addr, 3, "E4 cell", "E4", active_sheet) # I am here
     standard_testing(helper.calc_get_cell_text_with_addr, 3, "", "C20", active_sheet)
     standard_testing(helper.calc_set_cell_text_with_addr, -1, "K9", "K9 is a smart dog.", active_sheet)
     standard_testing(helper.calc_get_cell_text_with_addr, 3, "K9 is a smart dog.", "K9", active_sheet)

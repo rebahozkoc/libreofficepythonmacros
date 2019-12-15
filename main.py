@@ -10,9 +10,7 @@ import time
 #a = input("sfsz")
 #Calc replace all
 #helper.new_calc_doc(desktop)
-model = helper_oop.WordProcessor()
-time.sleep(3)
-model.closeFile()
+
 #active_sheet = helper.calc_get_active_sheet(model)
 #print(helper.calc_text_replace_all(active_sheet, "E4 cell", "E5"))
 
@@ -31,7 +29,7 @@ model.closeFile()
 #doc = helper.open_doc(desktop, "/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
 #dispatcher = helper.dispatcher(start_libreoffice_result[1])
 #search = helper.impress_text_search_dispatcher(doc, dispatcher, "fork")
-
-
+imp = helper_oop.Presentation("/home/rebahlinux/libreofficepythonmacros/impress_example.odp")
+imp.checkTextExists("fork")
 #Calc open a new file.
 #model = helper.new_calc_doc(desktop)

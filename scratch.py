@@ -89,10 +89,3 @@ import uno
 #
 
 
-def f(x):
-    a = x([(1, 'Geeks'), (2, 'For')])
-    return a
-
-b = f(dict)
-print(b.keys())
-print(b)

@@ -73,10 +73,30 @@ def test_calc_functions():
     standard_testing(calc.setCellText, -2, "A3", "TESTING SET CELL AGAIN")
     print(calc.getCellText("A3") == "TESTING SET CELL AGAIN")
     print(calc.getCellText("A4") == "I am at A4")
-    print("checkstr:", standard_testing(calc.checkStrExistsInCells, -2, "A1", "AA21", "E4 cell"))
-    print("checkstr:", not standard_testing(calc.checkStrExistsInCells, -2, "A1", "D5", "E4 cell"))
-    
+    print("checkstr:", standard_testing(calc.checkTextExists, -2, "A1", "AA21", "E4 cell"))
+    print("checkstr:", not standard_testing(calc.checkTextExists, -2, "A1", "D5", "E4 cell"))
+    print("checkvalueexists:", standard_testing(calc.checkValueExists, -2, "A1","AA21", 42))
+    print("checkvaluexeists:", not standard_testing(calc.checkValueExists, -2, "AA1","BD5", 42))
+    print("getStraddress:", calc.getStrAdressInCells("A1", "CC21", "I am at A4") == "A4")
+    print("getStraddress:", calc.getStrAdressInCells("A1", "CC21", "TESTING SET CELL AGAIN") == "A3")
+    print("getStraddress:", calc.getStrAdressInCells("BB1", "CC21", "TESTING SET CELL AGAIN") is False)
+    print("getValueaddress:", calc.getValueAdressInCells("BB1", "CC200", 3.14159) is False)
+    print("getValueaddress:", calc.getValueAdressInCells("A4", "CC200", 3.14159) == "B5")
+    print("getCellText:", calc.getCellText("E4") == "E4 cell")
+    print("getCellText:", calc.getCellText("C20") == "")
+    standard_testing(calc.setCellText, -2, "K9", "K9 is a smart dog.")
+    print("getCellText:", calc.getCellText("K9") == "K9 is a smart dog.")
+    calc.closeFile()
+
+
+def test_writer_functions():
+    doc = standard_testing(helper_oop.WordProcessor, -2, "/home/rebahlinux/libreofficepythonmacros/text_example.odt")
+    doc.textReplaceAll("office", "placeholder")
+
+def test_impress_functions():
+    pass
 
 
 #test_open_new_files()
-test_calc_functions()
+#test_calc_functions()
+test_writer_functions()
